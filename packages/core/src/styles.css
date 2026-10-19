@@ -1,0 +1,27 @@
+/* Everything else is Material UI; this only covers the confetti burst, which is
+   created imperatively in fx.ts. */
+.confetti-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1400;
+}
+.confetti-layer i {
+  position: absolute;
+  top: -20px;
+  width: 10px;
+  height: 16px;
+  border-radius: 2px;
+  animation-name: ttl-fall;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+@keyframes ttl-fall {
+  to { transform: translateY(110vh) rotate(720deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .confetti-layer { display: none; }
+}

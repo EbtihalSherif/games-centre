@@ -1,0 +1,8 @@
+node_modules
+dist
+.vercel
+
+# Secrets live in the single .env at the repo root; the example is committed.
+.env
+.env.*
+!.env.example

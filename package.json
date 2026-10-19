@@ -1,0 +1,26 @@
+{
+  "name": "games-center",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run build:games && concurrently -n two-truths,shell -c magenta,cyan \"npm:serve:two-truths\" \"npm:dev:shell\"",
+    "dev:shell": "npm run dev -w @games/shell",
+    "dev:two-truths": "npm run dev -w @games/two-truths",
+    "serve:two-truths": "npm run preview -w @games/two-truths",
+    "build": "npm run build:games && npm run build -w @games/shell",
+    "build:games": "npm run build -w @games/two-truths",
+    "preview": "npm run preview -w @games/shell",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.4",
+    "@types/react": "^18.3.11",
+    "@types/react-dom": "^18.3.0",
+    "concurrently": "^9.0.1",
+    "typescript": "^5.6.2"
+  }
+}
