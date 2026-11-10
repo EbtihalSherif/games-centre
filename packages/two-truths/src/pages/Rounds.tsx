@@ -108,7 +108,7 @@ export default function Rounds({ href }: { href: Href }) {
                 <ListItemButton
                   component={Link}
                   to={href(`/round/${r.id}`)}
-                  sx={{ borderRadius: 4, bgcolor: '#F6F1FF', py: 1.5, '&:hover': { bgcolor: '#EDE3FF' } }}
+                  sx={{ borderRadius: '16px', bgcolor: '#F6F1FF', py: 1.5, '&:hover': { bgcolor: '#EDE3FF' } }}
                 >
                   <ListItemText
                     primary={roundLabel(r)}

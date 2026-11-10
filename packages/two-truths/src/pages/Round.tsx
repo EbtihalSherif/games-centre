@@ -160,7 +160,7 @@ function Invite({ url }: { url: string }) {
   }
 
   return (
-    <Box sx={{ bgcolor: '#F6F1FF', borderRadius: 4, p: 2.5 }}>
+    <Box sx={{ bgcolor: '#F6F1FF', borderRadius: '20px', p: 2.5 }}>
       <Typography variant="h3" gutterBottom>🔗 Invite link</Typography>
       <Typography color="text.secondary" variant="body2" sx={{ mb: 1.5 }}>
         Send this to your players so they can add themselves to this round.

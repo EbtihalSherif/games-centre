@@ -30,7 +30,7 @@ export default function App() {
           zIndex: 'tooltip',
           px: 2,
           py: 1,
-          borderRadius: 2,
+          borderRadius: '10px',
           bgcolor: '#fff',
           color: '#000',
           '&:focus': { top: 8 },

@@ -188,7 +188,7 @@ export default function Submit({ href, roundId }: { href: Href; roundId: string 
           <RadioGroup value={lie ?? ''} onChange={(e) => setLie(Number(e.target.value))}>
             <Stack spacing={2}>
               {texts.map((t, i) => (
-                <Box key={i} sx={{ bgcolor: '#F6F1FF', borderRadius: 4, p: 2 }}>
+                <Box key={i} sx={{ bgcolor: '#F6F1FF', borderRadius: '18px', p: 2 }}>
                   <TextField
                     id={`s${i}`}
                     label={`Statement ${i + 1}`}
@@ -231,13 +231,13 @@ export default function Submit({ href, roundId }: { href: Href; roundId: string 
                 component="li"
                 direction={{ xs: 'column', sm: 'row' }}
                 spacing={2}
-                sx={{ bgcolor: '#F6F1FF', borderRadius: 4, p: 2 }}
+                sx={{ bgcolor: '#F6F1FF', borderRadius: '18px', p: 2 }}
               >
                 <Box
                   component="img"
                   src={b.preview}
                   alt={`Bonus photo ${i + 1} preview`}
-                  sx={{ width: 110, height: 110, objectFit: 'contain', borderRadius: 3, bgcolor: '#fff' }}
+                  sx={{ width: 110, height: 110, objectFit: 'contain', borderRadius: '10px', bgcolor: '#fff' }}
                 />
                 <Stack spacing={1.5} flex={1}>
                   <TextField
