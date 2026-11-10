@@ -51,7 +51,14 @@ export default function Rounds({ href }: { href: Href }) {
   }
 
   return (
-    <>
+    <Box
+      sx={{
+        display: 'grid',
+        gap: 3,
+        alignItems: 'start',
+        gridTemplateColumns: { xs: '1fr', md: 'minmax(0, 1fr) minmax(0, 1.15fr)' },
+      }}
+    >
       <Paper component="form" onSubmit={create} aria-labelledby="new-h" sx={{ overflow: 'hidden' }}>
         <Box sx={{ height: 10, backgroundImage: `linear-gradient(90deg, ${palette.violet}, ${palette.pink}, ${palette.sunshine}, ${palette.mint})` }} />
         <Stack spacing={2} sx={{ p: { xs: 3, sm: 4 } }}>
@@ -120,6 +127,6 @@ export default function Rounds({ href }: { href: Href }) {
           </List>
         )}
       </Paper>
-    </>
+    </Box>
   )
 }

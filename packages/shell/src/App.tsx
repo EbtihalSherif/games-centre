@@ -40,29 +40,37 @@ export default function App() {
       </Box>
 
       <AppBar position="static" elevation={0} color="transparent">
-        <Toolbar sx={{ maxWidth: 1000, width: '100%', mx: 'auto', gap: 2, flexWrap: 'wrap' }}>
-          <Typography
-            component={Link}
-            to="/"
-            variant="h2"
-            sx={{ flexGrow: 1, color: '#fff', textDecoration: 'none' }}
-          >
-            🎲 Games Centre
-          </Typography>
-          {game && (
-            <Stack direction="row" spacing={1} component="nav" aria-label="Main">
-              <Button component={Link} to="/" variant="text" sx={{ color: '#fff' }}>
-                All games
-              </Button>
-              <Button component={Link} to={game.basePath} variant="contained" aria-current="page">
-                {game.title}
-              </Button>
-            </Stack>
-          )}
-        </Toolbar>
+        <Container maxWidth="lg" disableGutters>
+          <Toolbar sx={{ gap: 2, flexWrap: 'wrap', px: { xs: 2, sm: 3 } }}>
+            <Typography
+              component={Link}
+              to="/"
+              variant="h2"
+              sx={{ flexGrow: 1, color: '#fff', textDecoration: 'none' }}
+            >
+              🎲 Games Centre
+            </Typography>
+            {game && (
+              <Stack direction="row" spacing={1} component="nav" aria-label="Main">
+                <Button component={Link} to="/" variant="text" sx={{ color: '#fff' }}>
+                  All games
+                </Button>
+                <Button component={Link} to={game.basePath} variant="contained" aria-current="page">
+                  {game.title}
+                </Button>
+              </Stack>
+            )}
+          </Toolbar>
+        </Container>
       </AppBar>
 
-      <Container component="main" id="main" tabIndex={-1} maxWidth="md" sx={{ pb: 10, outline: 'none' }}>
+      <Container
+        component="main"
+        id="main"
+        tabIndex={-1}
+        maxWidth="lg"
+        sx={{ py: { xs: 2, md: 3 }, pb: { xs: 8, md: 10 }, outline: 'none' }}
+      >
         {game ? (
           <ErrorBoundary key={game.id} fallback={<GameUnavailable game={game} />}>
             <Suspense fallback={<Loading title={game.title} />}>

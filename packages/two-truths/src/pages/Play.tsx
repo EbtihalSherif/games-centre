@@ -167,7 +167,7 @@ export default function Play({ href, roundId }: { href: Href; roundId: string })
         gridTemplateColumns: revealed && p.bonus?.length ? { xs: '1fr', md: 'minmax(0, 1.1fr) auto' } : '1fr',
       }}
     >
-      <Paper component="section" aria-labelledby="who" sx={{ overflow: 'hidden' }}>
+      <Paper component="section" aria-labelledby="who" sx={{ overflow: 'hidden', width: '100%', maxWidth: 680, mx: 'auto' }}>
         <LinearProgress
           variant="determinate"
           value={((idx + 1) / players.length) * 100}
@@ -377,7 +377,7 @@ type SetupProps = {
 function Setup({ people, onStart, onRefresh, href, roundId }: SetupProps) {
   const [shuffle, setShuffle] = useState(true)
   return (
-    <Paper component="section" aria-labelledby="setup-h" sx={{ overflow: 'hidden' }}>
+    <Paper component="section" aria-labelledby="setup-h" sx={{ overflow: 'hidden', width: '100%', maxWidth: 680, mx: 'auto' }}>
       <Box sx={{ height: 10, backgroundImage: `linear-gradient(90deg, ${palette.sunshine}, ${palette.coral}, ${palette.pink})` }} />
       <Stack spacing={3} sx={{ p: { xs: 3, sm: 4 } }}>
         <Box>

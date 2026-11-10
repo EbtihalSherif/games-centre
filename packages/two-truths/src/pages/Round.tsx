@@ -84,29 +84,41 @@ export default function Round({ href, roundId }: { href: Href; roundId: string }
           </Stack>
         </Box>
 
-        <Invite url={inviteUrl} />
+        <Box
+          sx={{
+            display: 'grid',
+            gap: 3,
+            alignItems: 'start',
+            gridTemplateColumns: { xs: '1fr', md: 'minmax(0, 1fr) minmax(0, 1fr)' },
+          }}
+        >
+          <Invite url={inviteUrl} />
 
-        {players.length === 0 ? (
-          <Typography color="text.secondary">
-            No players yet — send the invite link and they can add themselves. 👆
-          </Typography>
-        ) : (
-          <Stack direction="row" spacing={1.5} flexWrap="wrap" useFlexGap component="ul" sx={{ listStyle: 'none', p: 0, m: 0 }}>
-            {players.map((p) => (
-              <Stack
-                key={p.id}
-                component="li"
-                direction="row"
-                spacing={1.5}
-                alignItems="center"
-                sx={{ bgcolor: '#F6F1FF', borderRadius: 999, pl: 0.75, pr: 2, py: 0.75 }}
-              >
-                <Avatar src={p.photo_url} alt="" sx={{ width: 40, height: 40 }} />
-                <Typography fontWeight={700}>{p.name}</Typography>
+          {players.length === 0 ? (
+            <Typography color="text.secondary">
+              No players yet — send the invite link and they can add themselves. 👈
+            </Typography>
+          ) : (
+            <Box>
+              <Typography variant="h3" gutterBottom>🎭 Who's playing</Typography>
+              <Stack direction="row" spacing={1.5} flexWrap="wrap" useFlexGap component="ul" sx={{ listStyle: 'none', p: 0, m: 0 }}>
+                {players.map((p) => (
+                  <Stack
+                    key={p.id}
+                    component="li"
+                    direction="row"
+                    spacing={1.5}
+                    alignItems="center"
+                    sx={{ bgcolor: '#F6F1FF', borderRadius: 999, pl: 0.75, pr: 2, py: 0.75 }}
+                  >
+                    <Avatar src={p.photo_url} alt="" sx={{ width: 40, height: 40 }} />
+                    <Typography fontWeight={700}>{p.name}</Typography>
+                  </Stack>
+                ))}
               </Stack>
-            ))}
-          </Stack>
-        )}
+            </Box>
+          )}
+        </Box>
 
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
           <Button component={Link} to={href(`/round/${roundId}/add`)} size="large" fullWidth>
