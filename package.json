@@ -7,13 +7,13 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "npm run build:games && concurrently -n two-truths,shell -c magenta,cyan \"npm:serve:two-truths\" \"npm:dev:shell\"",
-    "dev:shell": "npm run dev -w @games/shell",
+    "dev": "npm run build:games && concurrently -n two-truths,centre -c magenta,cyan \"npm:serve:two-truths\" \"npm:dev:centre\"",
+    "dev:centre": "npm run dev -w @games/games-centre",
     "dev:two-truths": "npm run dev -w @games/two-truths",
     "serve:two-truths": "npm run preview -w @games/two-truths",
-    "build": "npm run build:games && npm run build -w @games/shell",
+    "build": "npm run build:games && npm run build -w @games/games-centre",
     "build:games": "npm run build -w @games/two-truths",
-    "preview": "npm run preview -w @games/shell",
+    "preview": "npm run preview -w @games/games-centre",
     "typecheck": "npm run typecheck --workspaces --if-present"
   },
   "devDependencies": {

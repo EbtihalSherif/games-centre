@@ -20,7 +20,7 @@ export default defineConfig(({ mode }) => {
     plugins: [
       react(),
       federation({
-        name: 'shell',
+        name: 'games_centre',
         remotes: {
           two_truths: remote(env.VITE_GAME_TWO_TRUTHS_URL || 'http://localhost:4174'),
         },
@@ -30,7 +30,7 @@ export default defineConfig(({ mode }) => {
     server: { port: 5173 },
     preview: { port: 4173 },
     // This repo lives in OneDrive, which locks files and makes Vite's dep cache fail to rename.
-    cacheDir: join(tmpdir(), 'vite-games-centre', 'shell'),
+    cacheDir: join(tmpdir(), 'vite-games-centre', 'centre'),
     optimizeDeps: { exclude: ['@games/core'] },
     build: { target: 'esnext', minify: false as const, cssCodeSplit: false },
   }
