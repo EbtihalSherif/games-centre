@@ -7,6 +7,9 @@ const LOCAL_KEY = 'ttl-demo-submissions'
 const LOCAL_ROUNDS_KEY = 'ttl-demo-rounds'
 const HOST_CODES_KEY = 'ttl-host-codes'
 
+// host_code is deliberately not selectable, so `*` would be rejected by Postgres.
+const ROUND_COLUMNS = 'id, name, player_ids, shuffled, lies_spotted, lies_guessed, created_at, finished_at'
+
 // No O/0/I/1 so the code survives being read aloud or copied off a screen.
 const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
 
@@ -68,7 +71,7 @@ export async function createRound(
   const { data, error } = await db()
     .from('rounds')
     .insert({ name: trimmed || null, host_code: hostCode })
-    .select('id, name, player_ids, shuffled, lies_spotted, lies_guessed, created_at, finished_at')
+    .select(ROUND_COLUMNS)
     .single()
   if (error) throw error
   const round = data as Round
@@ -101,7 +104,7 @@ export async function listRounds(): Promise<RoundSummary[]> {
   }
   const { data, error } = await db()
     .from('rounds')
-    .select('*, submissions(count)')
+    .select(`${ROUND_COLUMNS}, submissions(count)`)
     .order('created_at', { ascending: false })
   if (error) throw error
   type Row = Round & { submissions?: { count: number }[] }
@@ -113,7 +116,7 @@ export async function listRounds(): Promise<RoundSummary[]> {
 
 export async function getRound(id: string): Promise<Round | null> {
   if (isDemo) return readLocal<Round>(LOCAL_ROUNDS_KEY).find((r) => r.id === id) ?? null
-  const { data, error } = await db().from('rounds').select('*').eq('id', id).maybeSingle()
+  const { data, error } = await db().from('rounds').select(ROUND_COLUMNS).eq('id', id).maybeSingle()
   if (error) throw error
   return (data as Round | null) ?? null
 }

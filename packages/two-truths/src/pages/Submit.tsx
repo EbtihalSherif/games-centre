@@ -145,7 +145,7 @@ export default function Submit({ href, roundId }: { href: Href; roundId: string 
       onSubmit={submit}
       noValidate
       aria-labelledby="form-h"
-      sx={{ overflow: 'hidden', width: '100%', maxWidth: 760, mx: 'auto' }}
+      sx={{ overflow: 'hidden', width: '100%', maxWidth: 760, alignSelf: 'center' }}
     >
       <Box sx={{ height: 10, backgroundImage: `linear-gradient(90deg, ${palette.mint}, ${palette.sky}, ${palette.violet})` }} />
       <Stack spacing={3} sx={{ p: { xs: 3, sm: 4 } }}>
