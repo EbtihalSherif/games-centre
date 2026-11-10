@@ -6,12 +6,14 @@ import {
   Chip,
   CircularProgress,
   Divider,
+  FormControlLabel,
   List,
   ListItem,
   ListItemButton,
   ListItemText,
   Paper,
   Stack,
+  Switch,
   TextField,
   Typography,
 } from '@mui/material'
@@ -25,6 +27,7 @@ export default function Rounds({ href }: { href: Href }) {
   const [rounds, setRounds] = useState<RoundSummary[] | null>(null)
   const [loadError, setLoadError] = useState('')
   const [name, setName] = useState('')
+  const [requireCode, setRequireCode] = useState(true)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
 
@@ -42,7 +45,7 @@ export default function Rounds({ href }: { href: Href }) {
     setBusy(true)
     setError('')
     try {
-      const round = await createRound(name)
+      const round = await createRound(name, { requireCode })
       navigate(href(`/round/${round.round.id}`))
     } catch {
       setError("We couldn't start that round. Please try again.")
@@ -77,6 +80,17 @@ export default function Rounds({ href }: { href: Href }) {
             onChange={(e) => setName(e.target.value)}
             slotProps={{ htmlInput: { maxLength: 80 } }}
           />
+          <Box>
+            <FormControlLabel
+              control={<Switch checked={requireCode} onChange={(e) => setRequireCode(e.target.checked)} />}
+              label="Only I can start this round"
+            />
+            <Typography color="text.secondary" variant="body2">
+              {requireCode
+                ? "You'll get a host code. Players can still join with the link — they just can't start the game."
+                : 'Anyone with the link can start the game.'}
+            </Typography>
+          </Box>
           <Button type="submit" size="large" disabled={busy} aria-busy={busy}>
             {busy ? 'Starting…' : 'Create round'}
           </Button>

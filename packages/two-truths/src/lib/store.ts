@@ -43,9 +43,12 @@ function demoRound(roundId: string): DemoRound | undefined {
   return readLocal<DemoRound>(LOCAL_ROUNDS_KEY).find((r) => r.id === roundId)
 }
 
-export async function createRound(name: string): Promise<{ round: Round; hostCode: string }> {
+export async function createRound(
+  name: string,
+  { requireCode }: { requireCode: boolean }
+): Promise<{ round: Round; hostCode: string | null }> {
   const trimmed = name.trim()
-  const hostCode = makeHostCode()
+  const hostCode = requireCode ? makeHostCode() : null
   if (isDemo) {
     const round: DemoRound = {
       id: crypto.randomUUID(),
@@ -59,7 +62,7 @@ export async function createRound(name: string): Promise<{ round: Round; hostCod
       host_code: hostCode,
     }
     writeLocal(LOCAL_ROUNDS_KEY, [...readLocal<DemoRound>(LOCAL_ROUNDS_KEY), round])
-    rememberHostCode(round.id, hostCode)
+    if (hostCode) rememberHostCode(round.id, hostCode)
     return { round, hostCode }
   }
   const { data, error } = await db()
@@ -69,7 +72,7 @@ export async function createRound(name: string): Promise<{ round: Round; hostCod
     .single()
   if (error) throw error
   const round = data as Round
-  rememberHostCode(round.id, hostCode)
+  if (hostCode) rememberHostCode(round.id, hostCode)
   return { round, hostCode }
 }
 
