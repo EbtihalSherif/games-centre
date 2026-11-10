@@ -35,11 +35,47 @@ create table if not exists public.submissions (
 
 -- For databases created before rounds owned their players.
 alter table public.rounds add column if not exists name text;
+alter table public.rounds add column if not exists host_code text;
 alter table public.submissions
   add column if not exists round_id uuid references public.rounds (id) on delete cascade;
 
 create index if not exists rounds_created_at_idx on public.rounds (created_at desc);
 create index if not exists submissions_round_id_idx on public.submissions (round_id);
+
+-- The anon key ships in the browser, so host_code must never be selectable through
+-- the API. Drop the blanket select grant and re-grant every column except that one.
+revoke select on public.rounds from anon, authenticated;
+grant select (id, name, player_ids, shuffled, lies_spotted, lies_guessed, created_at, finished_at)
+  on public.rounds to anon, authenticated;
+
+-- Checking the code happens inside the database, so the value never leaves it.
+create or replace function public.round_host_code_ok(p_round uuid, p_code text)
+returns boolean
+language sql
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1 from public.rounds
+    where id = p_round
+      and host_code is not null
+      and upper(host_code) = upper(btrim(p_code))
+  );
+$$;
+
+grant execute on function public.round_host_code_ok(uuid, text) to anon, authenticated;
+
+-- Rounds made before host codes existed stay open to everyone.
+create or replace function public.round_needs_host_code(p_round uuid)
+returns boolean
+language sql
+security definer
+set search_path = public
+as $$
+  select coalesce((select host_code is not null from public.rounds where id = p_round), false);
+$$;
+
+grant execute on function public.round_needs_host_code(uuid) to anon, authenticated;
 
 alter table public.rounds enable row level security;
 alter table public.submissions enable row level security;

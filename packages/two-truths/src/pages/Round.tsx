@@ -15,7 +15,7 @@ import {
   Typography,
 } from '@mui/material'
 import { Link, palette } from '@games/core'
-import { getRound, listPlayers } from '../lib/store'
+import { getRound, listPlayers, rememberedHostCode } from '../lib/store'
 import { roundLabel } from '../lib/round'
 import type { Href } from '../Game'
 import type { Round as RoundType, Submission } from '../types'
@@ -66,6 +66,7 @@ export default function Round({ href, roundId }: { href: Href; roundId: string }
 
   const ready = players.length >= 2
   const inviteUrl = window.location.origin + href(`/round/${roundId}`)
+  const hostCode = rememberedHostCode(roundId)
 
   return (
     <Paper component="section" aria-labelledby="round-h" sx={{ overflow: 'hidden' }}>
@@ -83,6 +84,21 @@ export default function Round({ href, roundId }: { href: Href; roundId: string }
             )}
           </Stack>
         </Box>
+
+        {hostCode && (
+          <Box sx={{ bgcolor: '#FFF6DF', border: '2px solid', borderColor: 'warning.main', borderRadius: '20px', p: 2.5 }}>
+            <Typography variant="h3" gutterBottom>🔑 Your host code</Typography>
+            <Typography color="text.secondary" variant="body2" sx={{ mb: 1.5 }}>
+              You'll need this to start the game. Keep it to yourself — anyone with the invite link can join,
+              but only someone with the code can play the round.
+            </Typography>
+            <Typography
+              sx={{ fontFamily: 'monospace', fontSize: '1.8rem', fontWeight: 800, letterSpacing: '.18em' }}
+            >
+              {hostCode}
+            </Typography>
+          </Box>
+        )}
 
         <Box
           sx={{

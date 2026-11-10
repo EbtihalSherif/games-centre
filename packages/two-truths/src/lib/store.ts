@@ -5,6 +5,28 @@ export { uploadImage }
 
 const LOCAL_KEY = 'ttl-demo-submissions'
 const LOCAL_ROUNDS_KEY = 'ttl-demo-rounds'
+const HOST_CODES_KEY = 'ttl-host-codes'
+
+// No O/0/I/1 so the code survives being read aloud or copied off a screen.
+const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+
+function makeHostCode(): string {
+  const bytes = crypto.getRandomValues(new Uint8Array(6))
+  return [...bytes].map((b) => CODE_ALPHABET[b % CODE_ALPHABET.length]).join('')
+}
+
+function readCodes(): Record<string, string> {
+  return JSON.parse(localStorage.getItem(HOST_CODES_KEY) || '{}') as Record<string, string>
+}
+
+/** The host's own copy, so they aren't asked for it again on this device. */
+export function rememberedHostCode(roundId: string): string | null {
+  return readCodes()[roundId] ?? null
+}
+
+export function rememberHostCode(roundId: string, code: string): void {
+  localStorage.setItem(HOST_CODES_KEY, JSON.stringify({ ...readCodes(), [roundId]: code }))
+}
 
 function readLocal<T>(key: string): T[] {
   return JSON.parse(localStorage.getItem(key) || '[]') as T[]
@@ -14,10 +36,18 @@ function writeLocal<T>(key: string, rows: T[]): void {
   localStorage.setItem(key, JSON.stringify(rows))
 }
 
-export async function createRound(name: string): Promise<Round> {
+/** Demo rounds live in localStorage, so they carry the code the server would normally hold. */
+type DemoRound = Round & { host_code?: string | null }
+
+function demoRound(roundId: string): DemoRound | undefined {
+  return readLocal<DemoRound>(LOCAL_ROUNDS_KEY).find((r) => r.id === roundId)
+}
+
+export async function createRound(name: string): Promise<{ round: Round; hostCode: string }> {
   const trimmed = name.trim()
+  const hostCode = makeHostCode()
   if (isDemo) {
-    const round: Round = {
+    const round: DemoRound = {
       id: crypto.randomUUID(),
       name: trimmed || null,
       player_ids: [],
@@ -26,17 +56,37 @@ export async function createRound(name: string): Promise<Round> {
       lies_guessed: 0,
       created_at: new Date().toISOString(),
       finished_at: null,
+      host_code: hostCode,
     }
-    writeLocal(LOCAL_ROUNDS_KEY, [...readLocal<Round>(LOCAL_ROUNDS_KEY), round])
-    return round
+    writeLocal(LOCAL_ROUNDS_KEY, [...readLocal<DemoRound>(LOCAL_ROUNDS_KEY), round])
+    rememberHostCode(round.id, hostCode)
+    return { round, hostCode }
   }
   const { data, error } = await db()
     .from('rounds')
-    .insert({ name: trimmed || null })
-    .select('*')
+    .insert({ name: trimmed || null, host_code: hostCode })
+    .select('id, name, player_ids, shuffled, lies_spotted, lies_guessed, created_at, finished_at')
     .single()
   if (error) throw error
-  return data as Round
+  const round = data as Round
+  rememberHostCode(round.id, hostCode)
+  return { round, hostCode }
+}
+
+export async function hostCodeRequired(roundId: string): Promise<boolean> {
+  if (isDemo) return !!demoRound(roundId)?.host_code
+  const { data, error } = await db().rpc('round_needs_host_code', { p_round: roundId })
+  if (error) throw error
+  return data === true
+}
+
+export async function checkHostCode(roundId: string, code: string): Promise<boolean> {
+  const entered = code.trim().toUpperCase()
+  if (!entered) return false
+  if (isDemo) return demoRound(roundId)?.host_code?.toUpperCase() === entered
+  const { data, error } = await db().rpc('round_host_code_ok', { p_round: roundId, p_code: entered })
+  if (error) throw error
+  return data === true
 }
 
 export async function listRounds(): Promise<RoundSummary[]> {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import {
   Alert,
   Avatar,
@@ -12,11 +12,20 @@ import {
   Paper,
   Stack,
   Switch,
+  TextField,
   Typography,
 } from '@mui/material'
 import { keyframes } from '@emotion/react'
 import { confetti, Link, palette, shuffleSeeded } from '@games/core'
-import { listPlayers, startPlay, finishRound } from '../lib/store'
+import {
+  listPlayers,
+  startPlay,
+  finishRound,
+  checkHostCode,
+  hostCodeRequired,
+  rememberedHostCode,
+  rememberHostCode,
+} from '../lib/store'
 import type { Href } from '../Game'
 import type { Statement, Submission } from '../types'
 
@@ -51,6 +60,102 @@ const polaroidPop = keyframes`
 `
 
 export default function Play({ href, roundId }: { href: Href; roundId: string }) {
+  const [unlocked, setUnlocked] = useState<boolean | null>(null)
+
+  useEffect(() => {
+    let active = true
+    setUnlocked(null)
+    hostCodeRequired(roundId)
+      .then(async (needed) => {
+        if (!needed) return true
+        const saved = rememberedHostCode(roundId)
+        return saved ? checkHostCode(roundId, saved) : false
+      })
+      // A lookup failure shouldn't lock the host out; the gate re-checks on submit.
+      .catch(() => false)
+      .then((ok) => active && setUnlocked(ok))
+    return () => {
+      active = false
+    }
+  }, [roundId])
+
+  if (unlocked === null)
+    return (
+      <Stack alignItems="center" spacing={2} sx={{ py: 6 }} role="status">
+        <CircularProgress />
+        <Typography>Checking the round…</Typography>
+      </Stack>
+    )
+
+  if (!unlocked)
+    return <HostGate href={href} roundId={roundId} onUnlock={() => setUnlocked(true)} />
+
+  return <Game href={href} roundId={roundId} />
+}
+
+function HostGate({
+  href,
+  roundId,
+  onUnlock,
+}: {
+  href: Href
+  roundId: string
+  onUnlock: () => void
+}) {
+  const [code, setCode] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
+
+  async function submit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setBusy(true)
+    setError('')
+    try {
+      if (await checkHostCode(roundId, code)) {
+        rememberHostCode(roundId, code.trim().toUpperCase())
+        return onUnlock()
+      }
+      setError("That code doesn't match this round.")
+    } catch {
+      setError("We couldn't check that code. Check your connection and try again.")
+    }
+    setBusy(false)
+  }
+
+  return (
+    <Paper
+      component="form"
+      onSubmit={submit}
+      sx={{ overflow: 'hidden', width: '100%', maxWidth: 520, mx: 'auto' }}
+    >
+      <Box sx={{ height: 10, backgroundImage: `linear-gradient(90deg, ${palette.sunshine}, ${palette.coral})` }} />
+      <Stack spacing={2.5} sx={{ p: { xs: 3, sm: 4 }, textAlign: 'center' }} alignItems="center">
+        <Typography sx={{ fontSize: '3.2rem', lineHeight: 1 }} aria-hidden>🔑</Typography>
+        <Typography variant="h1">Host code needed</Typography>
+        <Typography color="text.secondary">
+          Only whoever created this round can start it. Ask them for the code.
+        </Typography>
+        {error && <Alert severity="error" sx={{ width: '100%' }}>{error}</Alert>}
+        <TextField
+          id="host-code"
+          label="Host code"
+          value={code}
+          onChange={(e) => setCode(e.target.value.toUpperCase())}
+          slotProps={{ htmlInput: { maxLength: 12, style: { textTransform: 'uppercase', letterSpacing: '.18em', fontFamily: 'monospace' } } }}
+          autoFocus
+        />
+        <Button type="submit" size="large" fullWidth disabled={busy} aria-busy={busy}>
+          {busy ? 'Checking…' : 'Start the round'}
+        </Button>
+        <Button component={Link} to={href(`/round/${roundId}`)} variant="text" size="small">
+          ← Back to the round
+        </Button>
+      </Stack>
+    </Paper>
+  )
+}
+
+function Game({ href, roundId }: { href: Href; roundId: string }) {
   const [people, setPeople] = useState<Submission[] | null>(null)
   const [loadError, setLoadError] = useState('')
   const [players, setPlayers] = useState<Player[] | null>(null) // null = setup screen

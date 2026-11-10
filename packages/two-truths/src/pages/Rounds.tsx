@@ -43,7 +43,7 @@ export default function Rounds({ href }: { href: Href }) {
     setError('')
     try {
       const round = await createRound(name)
-      navigate(href(`/round/${round.id}`))
+      navigate(href(`/round/${round.round.id}`))
     } catch {
       setError("We couldn't start that round. Please try again.")
       setBusy(false)
